@@ -1,10 +1,10 @@
 {
   "name": "flatpee-whatsapp-bot",
   "version": "1.0.0",
-  "description": "Whatsapp Bot with OpenAI Integration",
+  "description": "Whatsapp Bot with AI Integration",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -13,7 +13,8 @@
   "keywords": [
     "whatsapp",
     "bot",
-    "openai"
+    "openai",
+    "geminiai"
   ],
   "author": "Abdullah Isbarul Fahmi",
   "license": "ISC",
@@ -22,6 +23,7 @@
   },
   "homepage": "https://github.com/AisAif/flatpee-whatsapp-bot#readme",
   "dependencies": {
+    "@google/generative-ai": "^0.6.0",
     "dotenv": "^16.4.5",
     "openai": "^4.33.1",
     "qrcode-terminal": "^0.12.0",
