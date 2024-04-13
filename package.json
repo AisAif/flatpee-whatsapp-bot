@@ -20,5 +20,9 @@
   "bugs": {
     "url": "https://github.com/AisAif/flatpee-whatsapp-bot/issues"
   },
-  "homepage": "https://github.com/AisAif/flatpee-whatsapp-bot#readme"
+  "homepage": "https://github.com/AisAif/flatpee-whatsapp-bot#readme",
+  "dependencies": {
+    "openai": "^4.33.1",
+    "whatsapp-web.js": "^1.23.0"
+  }
 }
