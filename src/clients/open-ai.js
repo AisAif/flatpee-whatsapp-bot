@@ -1,7 +1,8 @@
-const { default: OpenAI } = require("openai");
-require("dotenv").config();
+import OpenAI from "openai";
+import dotenv from "dotenv";
+dotenv.config();
 
-class OpenAI {
+export default class OpenAIClient {
   client;
   constructor() {
     this.client = new OpenAI({
@@ -11,7 +12,7 @@ class OpenAI {
 
   async sendPrompt(prompt) {
     try {
-      response = await this.client.chat.completions.create({
+      const response = await this.client.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [
           {
@@ -29,4 +30,3 @@ class OpenAI {
   }
 }
 
-module.exports = OpenAI;

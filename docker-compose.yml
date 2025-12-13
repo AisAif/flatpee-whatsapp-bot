@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  whatsapp-bot:
+    build: .
+    container_name: flatpee-whatsapp-bot
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - NODE_OPTIONS=--max-old-space-size=2048
+    env_file:
+      - .env
+    volumes:
+      - auth-data:/app/auth-data
+    # Set proper permissions for the volume
+    user: "9999:9999"
+    networks:
+      - whatsapp-network
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+    # Optional: Add health check
+    healthcheck:
+      test: ["CMD", "node", "-e", "console.log('Health check passed')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  auth-data:
+networks:
+  whatsapp-network:
+    driver: bridge
