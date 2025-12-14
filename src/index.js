@@ -1,18 +1,17 @@
 import pkg from "whatsapp-web.js";
 const { Client, LocalAuth } = pkg;
 import { useWAClient, useAIClient, run } from "./client-listener.js";
-import getClient from "./utils/get-client.js";
+import getAiAgent from "./utils/get-ai-agent.js";
 import dotenv from "dotenv";
 import logMessage from "./utils/log.js";
 dotenv.config();
 
 logMessage("🚀 Starting WhatsApp Bot Application", "START");
 logMessage(`📱 Using AI Client: ${process.env.CLIENT || "ollama"}`, "CONFIG");
-const webVersionUrl = process.env.WEB_VERSION_CACHE_URL || "https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2410.1.html";
-logMessage(
-  `🌐 Web Version Cache URL: ${webVersionUrl}`,
-  "CONFIG"
-);
+const webVersionUrl =
+  process.env.WEB_VERSION_CACHE_URL ||
+  "https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2410.1.html";
+logMessage(`🌐 Web Version Cache URL: ${webVersionUrl}`, "CONFIG");
 logMessage(`📁 Auth Data Path: ./auth-data`, "CONFIG");
 
 useWAClient(
@@ -48,7 +47,7 @@ useWAClient(
   })
 );
 
-const aiClient = getClient(process.env.CLIENT || "ollama");
+const aiClient = getAiAgent(process.env.CLIENT || "ollama");
 useAIClient(aiClient);
 
 logMessage("✅ Configuration completed, starting bot...", "SUCCESS");

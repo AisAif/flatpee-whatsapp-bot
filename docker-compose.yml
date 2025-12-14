@@ -12,6 +12,7 @@ services:
       - .env
     volumes:
       - auth-data:/app/auth-data
+      - ./knowledge:/app/knowledge
     # Set proper permissions for the volume
     user: "9999:9999"
     networks:

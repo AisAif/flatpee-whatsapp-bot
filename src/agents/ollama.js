@@ -1,9 +1,14 @@
 import { Ollama } from "ollama";
 import dotenv from "dotenv";
+import {
+  getSystemInstructions,
+  loadKnowledgeBase,
+} from "../utils/system-context.js";
 dotenv.config();
 
 export default class OllamaClient {
   client;
+  knowledgeBase = new Map();
 
   constructor() {
     const host = process.env.OLLAMA_HOST || "http://localhost:11434";
@@ -21,6 +26,9 @@ export default class OllamaClient {
         "X-API-Key": process.env.OLLAMA_API_KEY,
       },
     });
+
+    // Load knowledge base
+    loadKnowledgeBase();
   }
 
   async sendPrompt(prompt) {
@@ -28,12 +36,20 @@ export default class OllamaClient {
     const startTime = Date.now();
 
     console.log(`[OLLAMA] 🚀 Sending prompt to ${model}`);
-    console.log(`[OLLAMA] Input: "${prompt.substring(0, 100)}${prompt.length > 100 ? '...' : ''}"`);
+    console.log(
+      `[OLLAMA] Input: "${prompt.substring(0, 100)}${
+        prompt.length > 100 ? "..." : ""
+      }"`
+    );
 
     try {
       const response = await this.client.chat({
         model: model,
         messages: [
+          {
+            role: "system",
+            content: getSystemInstructions(),
+          },
           {
             role: "user",
             content: prompt,
@@ -42,15 +58,22 @@ export default class OllamaClient {
       });
 
       const processingTime = Date.now() - startTime;
-      const responseContent = response.message.content || response.response || '';
+      const responseContent =
+        response.message.content || response.response || "";
 
       console.log(`[OLLAMA] ✅ Response received in ${processingTime}ms`);
-      console.log(`[OLLAMA] Output: "${responseContent.substring(0, 100)}${responseContent.length > 100 ? '...' : ''}"`);
+      console.log(
+        `[OLLAMA] Output: "${responseContent.substring(0, 100)}${
+          responseContent.length > 100 ? "..." : ""
+        }"`
+      );
 
       return responseContent;
     } catch (error) {
       const processingTime = Date.now() - startTime;
-      console.log(`[OLLAMA] ❌ Error after ${processingTime}ms: ${error.message}`);
+      console.log(
+        `[OLLAMA] ❌ Error after ${processingTime}ms: ${error.message}`
+      );
 
       // Log detailed error information
       if (error.response) {

@@ -19,8 +19,14 @@ export function run() {
 
   WAClient.on("ready", () => {
     logMessage("WhatsApp client is ready and connected!", "SUCCESS");
-    logMessage(`Client info: ${WAClient.info ? WAClient.info.pushname : 'Unknown'}`, "SUCCESS");
-    logMessage(`Phone number: ${WAClient.info ? WAClient.info.wid.user : 'Unknown'}`, "SUCCESS");
+    logMessage(
+      `Client info: ${WAClient.info ? WAClient.info.pushname : "Unknown"}`,
+      "SUCCESS"
+    );
+    logMessage(
+      `Phone number: ${WAClient.info ? WAClient.info.wid.user : "Unknown"}`,
+      "SUCCESS"
+    );
   });
 
   WAClient.on("authenticated", () => {
@@ -45,10 +51,34 @@ export function run() {
     logMessage(`  Message ID: ${message.id._serialized}`, "MESSAGE");
 
     // Check if it's a group message
-    if (message.from.includes("@g.us")) {
+    const isGroupMessage = message.from.includes("@g.us");
+    if (isGroupMessage) {
       logMessage(`  Type: Group Message`, "MESSAGE");
     } else {
       logMessage(`  Type: Private Message`, "MESSAGE");
+    }
+
+    // Check if bot is mentioned in group message
+    let isBotMentioned = false;
+    if (isGroupMessage) {
+      // Check if message contains mention of the bot
+      isBotMentioned = message.mentionedIds.some((id) => {
+        return id === process.env.CURRENT_USER_ID;
+      });
+
+      // Check both getMentions() result and mentionedIds
+
+      logMessage(`  Bot mentioned: ${isBotMentioned}`, "MESSAGE");
+
+      // Only process group messages if bot is mentioned
+      if (!isBotMentioned) {
+        logMessage(
+          `  ⏭️ Skipping group message (bot not mentioned)`,
+          "MESSAGE"
+        );
+        logMessage(`─`.repeat(80), "SEPARATOR");
+        return;
+      }
     }
 
     try {

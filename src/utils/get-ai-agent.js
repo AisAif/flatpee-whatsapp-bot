@@ -1,8 +1,8 @@
-import GenAIClient from "./../clients/gen-ai.js";
-import OpenAIClient from "./../clients/open-ai.js";
-import OllamaClient from "./../clients/ollama.js";
+import GenAIClient from "../agents/gen-ai.js";
+import OpenAIClient from "../agents/open-ai.js";
+import OllamaClient from "../agents/ollama.js";
 
-function getClient(client) {
+function getAIAgent(client) {
   switch (client) {
     case "open-ai":
       return new OpenAIClient();
@@ -15,4 +15,4 @@ function getClient(client) {
   }
 }
 
-export default getClient;
+export default getAIAgent;
