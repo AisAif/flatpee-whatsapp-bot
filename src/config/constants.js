@@ -46,4 +46,6 @@ export const LOG_LEVELS = {
   SEND: "SEND",
   INIT: "INIT",
   SEPARATOR: "SEPARATOR",
+  DEBUG: "DEBUG",
+  WARNING: "WARNING",
 };

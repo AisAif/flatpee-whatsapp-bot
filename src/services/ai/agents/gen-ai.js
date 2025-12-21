@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import {
   getSystemInstructions,
   loadKnowledgeBase,
-  logMessage
+  logMessage,
 } from "../../../utils/index.js";
 import { LOG_LEVELS } from "../../../config/constants.js";
 
@@ -23,24 +23,52 @@ export default class GenAIClient {
     loadKnowledgeBase();
   }
 
-  async sendPrompt(prompt) {
+  async sendPrompt(prompt, context = null) {
     const startTime = Date.now();
 
-    logMessage(`[AI] 🚀 Sending prompt to Gemini Pro`);
+    logMessage(
+      `[AI] 🚀 Sending prompt to Gemini Pro ${context ? "(with context)" : ""}`
+    );
     logMessage(
       `[GENAI] Input: "${prompt.substring(0, 100)}${
         prompt.length > 100 ? "..." : ""
       }"`
     );
 
+    if (context) {
+      logMessage(
+        `[GENAI] Context: ${context.totalMessages} messages`,
+        LOG_LEVELS.INFO
+      );
+    }
+
     try {
       const model = this.client.getGenerativeModel({
         model: process.env.GEN_AI_MODEL || "gemini-2.5-flash",
       });
 
+      // Build conversation history with context
+      let fullPrompt = getSystemInstructions();
+
+      // Add conversation context if available
+      if (context && context.recentMessages.length > 0) {
+        fullPrompt += "\n\n=== KONTEKS PERCAKAPAN SEBELUMNYA ===\n";
+
+        // Add recent conversation history
+        context.recentMessages.forEach((msg) => {
+          const sender = msg.direction === "inbound" ? "User" : "Assistant";
+          fullPrompt += `${sender}: ${msg.text}\n`;
+        });
+
+        fullPrompt += "=== AKHIR KONTEKS ===\n\n";
+      }
+
+      // Add current user message
+      fullPrompt += `Pesan user saat ini: ${prompt}`;
+
       const result = await model.generateContent({
         systemInstruction: getSystemInstructions(),
-        contents: [{ parts: [{ text: prompt }] }],
+        contents: [{ parts: [{ text: fullPrompt }] }],
       });
       const response = result.response;
 

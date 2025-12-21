@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import {
   getSystemInstructions,
   loadKnowledgeBase,
-  logMessage
+  logMessage,
 } from "../../../utils/index.js";
 import { LOG_LEVELS } from "../../../config/constants.js";
 
@@ -30,13 +30,13 @@ export default class OpenAIClient {
     loadKnowledgeBase();
   }
 
-  async sendPrompt(prompt) {
+  async sendPrompt(prompt, context = null) {
     const startTime = Date.now();
 
     logMessage(
       `[OPENAI] 🚀 Sending prompt to ${
         process.env.OPENAI_MODEL || "gpt-3.5-turbo"
-      }`
+      } ${context ? "(with context)" : ""}`
     );
     logMessage(
       `[OPENAI] Input: "${prompt.substring(0, 100)}${
@@ -44,19 +44,42 @@ export default class OpenAIClient {
       }"`
     );
 
+    if (context) {
+      logMessage(
+        `[OPENAI] Context: ${context.totalMessages} messages`,
+        LOG_LEVELS.INFO
+      );
+    }
+
     try {
+      // Build messages array with context
+      const messages = [
+        {
+          role: "system",
+          content: getSystemInstructions(),
+        },
+      ];
+
+      // Add conversation context if available
+      if (context && context.recentMessages.length > 0) {
+        // Add recent conversation history
+        context.recentMessages.forEach((msg) => {
+          messages.push({
+            role: msg.direction === "inbound" ? "user" : "assistant",
+            content: msg.text,
+          });
+        });
+      }
+
+      // Add current user message
+      messages.push({
+        role: "user",
+        content: prompt,
+      });
+
       const response = await this.client.chat.completions.create({
         model: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content: getSystemInstructions(),
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
+        messages: messages,
       });
 
       const processingTime = Date.now() - startTime;

@@ -2,7 +2,7 @@ import { Ollama } from "ollama";
 import {
   getSystemInstructions,
   loadKnowledgeBase,
-  logMessage
+  logMessage,
 } from "../../../utils/index.js";
 import { LOG_LEVELS } from "../../../config/constants.js";
 
@@ -31,30 +31,55 @@ export default class OllamaClient {
     loadKnowledgeBase();
   }
 
-  async sendPrompt(prompt) {
+  async sendPrompt(prompt, context = null) {
     const model = process.env.OLLAMA_MODEL || "tinyllama";
     const startTime = Date.now();
 
-    logMessage(`[AI] 🚀 Sending prompt to ${model}`);
+    logMessage(
+      `[AI] 🚀 Sending prompt to ${model} ${context ? "(with context)" : ""}`
+    );
     logMessage(
       `[OLLAMA] Input: "${prompt.substring(0, 100)}${
         prompt.length > 100 ? "..." : ""
       }"`
     );
 
+    if (context) {
+      logMessage(
+        `[OLLAMA] Context: ${context.totalMessages} messages`,
+        LOG_LEVELS.INFO
+      );
+    }
+
     try {
+      // Build messages array with context
+      const messages = [
+        {
+          role: "system",
+          content: getSystemInstructions(),
+        },
+      ];
+
+      // Add conversation context if available
+      if (context && context.recentMessages.length > 0) {
+        // Add recent conversation history
+        context.recentMessages.forEach((msg) => {
+          messages.push({
+            role: msg.direction === "inbound" ? "user" : "assistant",
+            content: msg.text,
+          });
+        });
+      }
+
+      // Add current user message
+      messages.push({
+        role: "user",
+        content: prompt,
+      });
+
       const response = await this.client.chat({
         model: model,
-        messages: [
-          {
-            role: "system",
-            content: getSystemInstructions(),
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
+        messages: messages,
       });
 
       const processingTime = Date.now() - startTime;
