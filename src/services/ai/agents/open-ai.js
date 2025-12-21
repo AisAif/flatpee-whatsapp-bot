@@ -1,10 +1,10 @@
 import OpenAI from "openai";
-import dotenv from "dotenv";
 import {
   getSystemInstructions,
   loadKnowledgeBase,
-} from "../utils/system-context.js";
-dotenv.config();
+  logMessage
+} from "../../../utils/index.js";
+import { LOG_LEVELS } from "../../../config/constants.js";
 
 export default class OpenAIClient {
   client;
@@ -14,11 +14,11 @@ export default class OpenAIClient {
     const apiKey = process.env.OPENAI_API_KEY;
     const baseUrl = process.env.OPENAI_BASE_URL;
     if (!apiKey) {
-      console.log(
+      logMessage(
         `[OPENAI] ⚠️ OPENAI_API_KEY not found in environment variables`
       );
     } else {
-      console.log(`[OPENAI] ✅ API Key found`);
+      logMessage(`[AI] ✅ API Key found`);
     }
 
     this.client = new OpenAI({
@@ -33,12 +33,12 @@ export default class OpenAIClient {
   async sendPrompt(prompt) {
     const startTime = Date.now();
 
-    console.log(
+    logMessage(
       `[OPENAI] 🚀 Sending prompt to ${
         process.env.OPENAI_MODEL || "gpt-3.5-turbo"
       }`
     );
-    console.log(
+    logMessage(
       `[OPENAI] Input: "${prompt.substring(0, 100)}${
         prompt.length > 100 ? "..." : ""
       }"`
@@ -62,8 +62,8 @@ export default class OpenAIClient {
       const processingTime = Date.now() - startTime;
       const responseContent = response.choices[0].message.content;
 
-      console.log(`[OPENAI] ✅ Response received in ${processingTime}ms`);
-      console.log(
+      logMessage(`[AI] ✅ Response received in ${processingTime}ms`);
+      logMessage(
         `[OPENAI] Output: "${responseContent.substring(0, 100)}${
           responseContent.length > 100 ? "..." : ""
         }"`
@@ -72,17 +72,17 @@ export default class OpenAIClient {
       return responseContent;
     } catch (error) {
       const processingTime = Date.now() - startTime;
-      console.log(
+      logMessage(
         `[OPENAI] ❌ Error after ${processingTime}ms: ${error.message}`
       );
 
       // Log detailed error information
       if (error.response) {
-        console.log(`[OPENAI] Response status: ${error.response.status}`);
-        console.log(`[OPENAI] Response data:`, error.response.data);
+        logMessage(`[AI] Response status: ${error.response.status}`);
+        logMessage(`[AI] Response data:`, error.response.data);
       }
       if (error.request) {
-        console.log(`[OPENAI] Request failed:`, error.request);
+        logMessage(`[AI] Request failed:`, error.request);
       }
 
       return "Maaf, terjadi kesalahan saat menghubungi OpenAI. Pastikan API key valid dan koneksi internet stabil.";

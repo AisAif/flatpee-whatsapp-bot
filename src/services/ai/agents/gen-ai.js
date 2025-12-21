@@ -1,10 +1,10 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import dotenv from "dotenv";
 import {
   getSystemInstructions,
   loadKnowledgeBase,
-} from "../utils/system-context.js";
-dotenv.config();
+  logMessage
+} from "../../../utils/index.js";
+import { LOG_LEVELS } from "../../../config/constants.js";
 
 export default class GenAIClient {
   client;
@@ -12,9 +12,9 @@ export default class GenAIClient {
   constructor() {
     const apiKey = process.env.GEN_API_KEY;
     if (!apiKey) {
-      console.log(`[GENAI] ⚠️ GEN_API_KEY not found in environment variables`);
+      logMessage(`[AI] ⚠️ GEN_API_KEY not found in environment variables`);
     } else {
-      console.log(`[GENAI] ✅ API Key found`);
+      logMessage(`[AI] ✅ API Key found`);
     }
 
     this.client = new GoogleGenerativeAI(apiKey);
@@ -26,8 +26,8 @@ export default class GenAIClient {
   async sendPrompt(prompt) {
     const startTime = Date.now();
 
-    console.log(`[GENAI] 🚀 Sending prompt to Gemini Pro`);
-    console.log(
+    logMessage(`[AI] 🚀 Sending prompt to Gemini Pro`);
+    logMessage(
       `[GENAI] Input: "${prompt.substring(0, 100)}${
         prompt.length > 100 ? "..." : ""
       }"`
@@ -47,8 +47,8 @@ export default class GenAIClient {
       const processingTime = Date.now() - startTime;
       const responseContent = response.text();
 
-      console.log(`[GENAI] ✅ Response received in ${processingTime}ms`);
-      console.log(
+      logMessage(`[AI] ✅ Response received in ${processingTime}ms`);
+      logMessage(
         `[GENAI] Output: "${responseContent.substring(0, 100)}${
           responseContent.length > 100 ? "..." : ""
         }"`
@@ -57,16 +57,16 @@ export default class GenAIClient {
       return responseContent;
     } catch (error) {
       const processingTime = Date.now() - startTime;
-      console.log(
+      logMessage(
         `[GENAI] ❌ Error after ${processingTime}ms: ${error.message}`
       );
 
       // Log detailed error information
       if (error.status) {
-        console.log(`[GENAI] Status: ${error.status}`);
+        logMessage(`[AI] Status: ${error.status}`);
       }
       if (error.response) {
-        console.log(`[GENAI] Response:`, error.response);
+        logMessage(`[AI] Response:`, error.response);
       }
 
       return "Maaf, terjadi kesalahan saat menghubungi Google Gemini. Pastikan API key valid dan koneksi internet stabil.";

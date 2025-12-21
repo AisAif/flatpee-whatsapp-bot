@@ -1,10 +1,10 @@
 import { Ollama } from "ollama";
-import dotenv from "dotenv";
 import {
   getSystemInstructions,
   loadKnowledgeBase,
-} from "../utils/system-context.js";
-dotenv.config();
+  logMessage
+} from "../../../utils/index.js";
+import { LOG_LEVELS } from "../../../config/constants.js";
 
 export default class OllamaClient {
   client;
@@ -15,10 +15,10 @@ export default class OllamaClient {
     const model = process.env.OLLAMA_MODEL || "tinyllama";
     const hasApiKey = process.env.OLLAMA_API_KEY ? "Yes" : "No";
 
-    console.log(`[OLLAMA] Initializing client...`);
-    console.log(`[OLLAMA] Host: ${host}`);
-    console.log(`[OLLAMA] Model: ${model}`);
-    console.log(`[OLLAMA] API Key: ${hasApiKey}`);
+    logMessage(`[AI] Initializing client...`, LOG_LEVELS.INFO);
+    logMessage(`[AI] Host: ${host}`, LOG_LEVELS.INFO);
+    logMessage(`[AI] Model: ${model}`, LOG_LEVELS.INFO);
+    logMessage(`[AI] API Key: ${hasApiKey}`, LOG_LEVELS.INFO);
 
     this.client = new Ollama({
       host: host,
@@ -35,8 +35,8 @@ export default class OllamaClient {
     const model = process.env.OLLAMA_MODEL || "tinyllama";
     const startTime = Date.now();
 
-    console.log(`[OLLAMA] 🚀 Sending prompt to ${model}`);
-    console.log(
+    logMessage(`[AI] 🚀 Sending prompt to ${model}`);
+    logMessage(
       `[OLLAMA] Input: "${prompt.substring(0, 100)}${
         prompt.length > 100 ? "..." : ""
       }"`
@@ -61,8 +61,8 @@ export default class OllamaClient {
       const responseContent =
         response.message.content || response.response || "";
 
-      console.log(`[OLLAMA] ✅ Response received in ${processingTime}ms`);
-      console.log(
+      logMessage(`[AI] ✅ Response received in ${processingTime}ms`);
+      logMessage(
         `[OLLAMA] Output: "${responseContent.substring(0, 100)}${
           responseContent.length > 100 ? "..." : ""
         }"`
@@ -71,17 +71,17 @@ export default class OllamaClient {
       return responseContent;
     } catch (error) {
       const processingTime = Date.now() - startTime;
-      console.log(
+      logMessage(
         `[OLLAMA] ❌ Error after ${processingTime}ms: ${error.message}`
       );
 
       // Log detailed error information
       if (error.response) {
-        console.log(`[OLLAMA] Response status: ${error.response.status}`);
-        console.log(`[OLLAMA] Response data:`, error.response.data);
+        logMessage(`[AI] Response status: ${error.response.status}`);
+        logMessage(`[AI] Response data:`, error.response.data);
       }
       if (error.request) {
-        console.log(`[OLLAMA] Request failed:`, error.request);
+        logMessage(`[AI] Request failed:`, error.request);
       }
 
       return "Maaf, terjadi kesalahan saat menghubungi server Ollama. Pastikan server Ollama sedang berjalan.";

@@ -18,6 +18,7 @@ npm run dev
 npm run start
 ``
 ## How to Use
+- Add some knowledge to /knowledge folder (md or txt file)
 - Run the server 
 - Link WhatsApp account by scanning the generated QR code
 

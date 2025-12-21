@@ -1,4 +1,4 @@
-import logMessage from "./log.js";
+import logMessage from "./logger.js";
 import fs from "fs/promises";
 import path from "path";
 /**
@@ -53,10 +53,7 @@ export async function loadKnowledgeBase() {
       }
     }
 
-    logMessage(
-      `✅ Loaded ${knowledgeBase.size} knowledge files`,
-      "KNOWLEDGE"
-    );
+    logMessage(`✅ Loaded ${knowledgeBase.size} knowledge files`, "KNOWLEDGE");
   } catch (error) {
     logMessage(`⚠️ Knowledge base not found: ${error.message}`, "KNOWLEDGE");
   }
