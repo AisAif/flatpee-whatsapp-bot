@@ -298,7 +298,8 @@ Respond with only "YES" or "NO":`;
 
   async sendResponse(message, response) {
     logMessage(`📤 Sending response to ${message.from}`, LOG_LEVELS.SEND);
-    await this.whatsappClient.sendMessage(message.from, response);
+    // await this.whatsappClient.sendMessage(message.from, response);
+    await message.reply(response);
     logMessage(`✅ Response sent successfully`, LOG_LEVELS.SEND);
   }
 
