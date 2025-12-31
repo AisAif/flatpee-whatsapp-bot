@@ -207,8 +207,9 @@ export class MessageHandler {
 Message: "${messageText}"
 
 Return ONLY "YES" or "NO" based on these criteria:
-- YES if the message appears to be asking the bot for help, information, or assistance
-- YES if it mentions bot names (bot, ai, assistant, flatpee) or help requests
+- YES if it mentions bot names (bot, ai, assistant, ${
+        process.env.BOT_NAME ?? "flatpee"
+      })
 - NO if it's clearly a conversation between humans
 - NO if it's random chatter, greetings without questions, or general discussion
 
@@ -238,22 +239,14 @@ Respond with only "YES" or "NO":`;
    */
   fallbackPatternCheck(messageText) {
     const text = messageText.toLowerCase();
-    const botNames = ["flatpee", "bot", "assistant", "ai"];
-    const questionWords = [
-      "apa",
-      "berapa",
-      "bagaimana",
-      "bisakah",
-      "bisa",
-      "tolong",
-      "bantu",
+    const botNames = [
+      process.env.BOT_NAME ?? "flatpee",
+      "bot",
+      "assistant",
+      "ai",
     ];
 
-    return (
-      botNames.some((name) => text.includes(name)) ||
-      questionWords.some((word) => text.includes(word)) ||
-      text.includes("?")
-    );
+    return botNames.some((name) => text.includes(name));
   }
 
   async generateResponse(message) {
@@ -335,4 +328,3 @@ Respond with only "YES" or "NO":`;
     this.whatsappClient.initialize();
   }
 }
-
