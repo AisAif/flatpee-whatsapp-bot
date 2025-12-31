@@ -171,6 +171,19 @@ export class MessageHandler {
       return true;
     }
 
+    const quotedMsg = await message.getQuotedMessage();
+    if (
+      message.fromMe === false &&
+      message.hasQuotedMsg === true &&
+      quotedMsg.fromMe === true
+    ) {
+      logMessage(
+        `  🤖 Quoted message detected - will reply`,
+        LOG_LEVELS.MESSAGE
+      );
+      return true;
+    }
+
     // In groups, use AI to determine if message is directed at bot
     const isDirectedAtBot = await this.checkIfMessageDirectedAtBotWithAI(
       messageText
